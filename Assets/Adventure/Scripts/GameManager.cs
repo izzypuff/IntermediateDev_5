@@ -6,16 +6,13 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    //access end scene
+    private string End = "End";
 
-   private string End = "End";
-
-   public static void TriggerConvo(string dialogue)
+    //teleport function
+    public void Teleport()
     {
-        Debug.Log(dialogue);
-    }
-
-   public void Teleport()
-    {
+        //load end scene
        SceneManager.LoadScene(End);
     }
 }

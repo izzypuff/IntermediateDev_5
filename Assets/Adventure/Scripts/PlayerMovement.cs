@@ -9,10 +9,7 @@ public class PlayerMovement : MonoBehaviour
     //horizontal movement
     float horizontalMove;
     float verticalMove;
-    public float speed = 3f;
-
-    //rigid body
-    Rigidbody2D myBody;
+    public float moveSpeed = 3f;
 
     //animator
     Animator myAnim;
@@ -20,17 +17,10 @@ public class PlayerMovement : MonoBehaviour
     //sprite renderer
     SpriteRenderer myRend;
 
-    //access game manager
-    public GameManager gameManager;
-
-    //access teleport object
-    public GameObject Teleport;
-
     // Start is called before the first frame update
     void Start()
     {
         //gets components
-        myBody = GetComponent<Rigidbody2D>();
         myAnim = GetComponent<Animator>();
         myRend = GetComponent<SpriteRenderer>();
     }
@@ -38,28 +28,58 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(verticalMove);
-        //horizontal movement (A&D, left&right)
-        horizontalMove = Input.GetAxis("Horizontal");
+        Vector3 newPos = transform.position;
 
-        //vertical movement (W&S, up&down)
-        verticalMove = Input.GetAxis("Vertical");
+        //if up arrow or W key is pressed
+        if(Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
+        {
+            //walking up animation boolean is true
+            myAnim.SetBool("WalkUp", true);
+            //move y pos up
+            newPos.y += Time.deltaTime * moveSpeed;
+        }
+        else
+        {
+            //walking up animation boolean is false
+            myAnim.SetBool("WalkUp", false);
+        }
+
+
+        //if vertical movement is happening downwards
+        if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
+        {
+            //walking down animation boolean is true
+            myAnim.SetBool("WalkDown", true);
+            //move y pos down
+            newPos.y -= Time.deltaTime * moveSpeed;
+        }
+        //if not moving down
+        else
+        {
+            //walking down animation boolean is false
+            myAnim.SetBool("WalkDown", false);
+
+        }
 
         //if horizontal movement is happening to the right
-        if (horizontalMove > 0.1f)
+        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
         {
             //walking animation boolean is true
             myAnim.SetBool("WalkHorizontal", true);
             //do not flip the x to face right
             myRend.flipX = true;
+            //move x pos right
+            newPos.x += Time.deltaTime * moveSpeed;
         }
         //if horizontal movement is happening to the left 
-        else if (horizontalMove < -0.1f)
+        else if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
         {
             //walking horizontal animation boolean is true
             myAnim.SetBool("WalkHorizontal", true);
             //flip the x to face left
             myRend.flipX = false;
+            //move x pos left
+            newPos.x -= Time.deltaTime * moveSpeed;
         }
         //if not moving horizontal
         else
@@ -68,54 +88,6 @@ public class PlayerMovement : MonoBehaviour
             myAnim.SetBool("WalkHorizontal", false);
         }
 
-        //if vertical movement is happening upwards
-        if (verticalMove > 0.1f)
-        {
-            //walking up animation boolean is true
-            myAnim.SetBool("WalkUp", true);
-        }
-        //if not moving up
-        else
-        {
-            //walking up animation boolean is false
-            myAnim.SetBool("WalkUp", false);
-
-        }
-        //if vertical movement is happening downwards
-        if (verticalMove < -0.1f)
-        {
-            //walking down animation boolean is true
-            myAnim.SetBool("WalkDown", true);
-
-        }
-        //if not moving down
-        else
-        {
-           //walking down animation boolean is false
-           myAnim.SetBool("WalkDown", false);
-
-        }
-    }
-
-    void FixedUpdate()
-    {
-        //set movespeed to horizontal move float times speed
-        float horizontalSpeed = horizontalMove * speed;
-
-        float verticalSpeed = verticalMove * speed;
-
-        //set velocity to set velocity
-        myBody.velocity = new Vector3(horizontalSpeed, verticalSpeed, 0f);
-    }
-
-    //if colliding
-    void OnCollisionEnter2D(Collision2D collision)
-    {
-        //with teleport obj
-        if (collision.gameObject.name == "Exit")
-        {
-            //trigger game manager teleport function
-            gameManager.Teleport();
-        }
+        transform.position = newPos;
     }
 }
